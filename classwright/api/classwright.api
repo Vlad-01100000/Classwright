@@ -1,0 +1,668 @@
+# Classwright public API snapshot.
+# Regenerate with: mvn -pl classwright verify -Dclasswright.api.update=true
+# Any diff here is an API change and must be a deliberate, reviewed one.
+# Exported packages: com.classwright, com.classwright.beans, com.classwright.core, com.classwright.proxy, com.classwright.reflect, com.classwright.runtime
+
+public class com.classwright.ClasswrightException extends java.lang.RuntimeException
+    public <init>(java.lang.String)
+    public <init>(java.lang.String, java.lang.Throwable)
+
+public @interface com.classwright.Internal implements java.lang.annotation.Annotation
+
+public abstract class com.classwright.beans.BeanCopier
+    protected <init>()
+    public abstract void copy(java.lang.Object, java.lang.Object, com.classwright.beans.Converter)
+    public java.lang.String describeMapping()
+    public static com.classwright.beans.BeanCopier create(java.lang.Class<?>, java.lang.Class<?>, boolean)
+
+public class com.classwright.beans.BeanGenerator
+    public <init>()
+    public com.classwright.beans.BeanGenerator addProperty(java.lang.String, java.lang.Class<?>)
+    public com.classwright.beans.BeanGenerator setNeighbour(java.lang.Class<?>)
+    public com.classwright.beans.BeanGenerator setSuperclass(java.lang.Class<?>)
+    public java.lang.Class<?> createClass()
+    public java.lang.Object create()
+
+public abstract class com.classwright.beans.BeanMap extends java.util.AbstractMap<java.lang.String, java.lang.Object>
+    protected <init>()
+    protected abstract java.lang.Object getByIndex(java.lang.Object, int)
+    protected abstract java.lang.Object getByKey(java.lang.Object, java.lang.Object)
+    protected abstract java.lang.Object putByKey(java.lang.Object, java.lang.Object, java.lang.Object)
+    protected abstract void setByIndex(java.lang.Object, int, java.lang.Object)
+    protected java.lang.Class<?> propertyTypeAt(int)
+    public boolean containsKey(java.lang.Object)
+    public com.classwright.beans.BeanMap newInstance(java.lang.Object)
+    public int size()
+    public java.lang.Class<?> getPropertyType(java.lang.String)
+    public java.lang.Object get(java.lang.Object)
+    public java.lang.Object get(java.lang.Object, java.lang.Object)
+    public java.lang.Object getBean()
+    public java.lang.Object put(java.lang.Object, java.lang.Object, java.lang.Object)
+    public java.lang.Object put(java.lang.String, java.lang.Object)
+    public java.util.Set<java.lang.String> keySet()
+    public java.util.Set<java.util.Map$Entry<java.lang.String, java.lang.Object>> entrySet()
+    public static com.classwright.beans.BeanMap create(java.lang.Object)
+    public static com.classwright.beans.BeanMap forClass(java.lang.Class<?>)
+    public void setBean(java.lang.Object)
+
+@Internal com.classwright.beans.BulkAccessException (generated-code runtime ABI; no compatibility promise)
+
+public abstract class com.classwright.beans.BulkBean
+    protected <init>()
+    public abstract void getPropertyValues(java.lang.Object, java.lang.Object[])
+    public abstract void setPropertyValues(java.lang.Object, java.lang.Object[])
+    public java.lang.Class<?>[] getPropertyTypes()
+    public java.lang.Object[] getPropertyValues(java.lang.Object)
+    public java.lang.String toString()
+    public java.lang.String[] getGetters()
+    public java.lang.String[] getSetters()
+    public static com.classwright.beans.BulkBean create(java.lang.Class<?>, java.lang.String[], java.lang.String[], java.lang.Class<?>[])
+
+public interface com.classwright.beans.Converter
+    public abstract java.lang.Object convert(java.lang.Object, java.lang.Class<?>, java.lang.Object)
+
+public final class com.classwright.beans.ImmutableBean
+    public static java.lang.Object create(java.lang.Object)
+
+public final class com.classwright.core.AccessFlags
+    public static final int ABSTRACT = 1024
+    public static final int ANNOTATION = 8192
+    public static final int BRIDGE = 64
+    public static final int ENUM = 16384
+    public static final int FINAL = 16
+    public static final int INTERFACE = 512
+    public static final int MANDATED = 32768
+    public static final int NATIVE = 256
+    public static final int PRIVATE = 2
+    public static final int PROTECTED = 4
+    public static final int PUBLIC = 1
+    public static final int STATIC = 8
+    public static final int STRICT = 2048
+    public static final int SUPER = 32
+    public static final int SYNCHRONIZED = 32
+    public static final int SYNTHETIC = 4096
+    public static final int TRANSIENT = 128
+    public static final int VARARGS = 128
+    public static final int VOLATILE = 64
+    public static int forGeneratedOverrideOf(int)
+    public static java.lang.String describe(int)
+
+public final class com.classwright.core.ClassFileVersion
+    public static final int DEFAULT = 52
+    public static final int FIRST_VERSION_REQUIRING_FRAMES = 51
+    public static final int JAVA_11 = 55
+    public static final int JAVA_17 = 61
+    public static final int JAVA_21 = 65
+    public static final int JAVA_5 = 49
+    public static final int JAVA_6 = 50
+    public static final int JAVA_7 = 51
+    public static final int JAVA_8 = 52
+    public static java.lang.String describe(int)
+    public static void validate(int)
+
+public final class com.classwright.core.CodeBuilder
+    public com.classwright.core.CodeBuilder add(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder arrayLength()
+    public com.classwright.core.CodeBuilder arrayLoad(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder arrayStore(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder box(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder checkCast(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder dup()
+    public com.classwright.core.CodeBuilder dup2()
+    public com.classwright.core.CodeBuilder dupX1()
+    public com.classwright.core.CodeBuilder getField(java.lang.String, java.lang.String, com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder getStatic(java.lang.String, java.lang.String, com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder ifIntComparison(com.classwright.core.CodeBuilder$IntTest, java.lang.Runnable, java.lang.Runnable)
+    public com.classwright.core.CodeBuilder ifNonNull(java.lang.Runnable)
+    public com.classwright.core.CodeBuilder ifNull(java.lang.Runnable)
+    public com.classwright.core.CodeBuilder ifNullElse(java.lang.Runnable, java.lang.Runnable)
+    public com.classwright.core.CodeBuilder instanceOf(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder invokeConstructor(java.lang.String, com.classwright.core.CwMethodType)
+    public com.classwright.core.CodeBuilder invokeInterface(java.lang.String, java.lang.String, com.classwright.core.CwMethodType)
+    public com.classwright.core.CodeBuilder invokeSpecial(java.lang.String, java.lang.String, com.classwright.core.CwMethodType)
+    public com.classwright.core.CodeBuilder invokeSpecial(java.lang.String, java.lang.String, com.classwright.core.CwMethodType, boolean)
+    public com.classwright.core.CodeBuilder invokeStatic(java.lang.String, java.lang.String, com.classwright.core.CwMethodType)
+    public com.classwright.core.CodeBuilder invokeStatic(java.lang.String, java.lang.String, com.classwright.core.CwMethodType, boolean)
+    public com.classwright.core.CodeBuilder invokeVirtual(java.lang.String, java.lang.String, com.classwright.core.CwMethodType)
+    public com.classwright.core.CodeBuilder load(int, com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder loadAllArguments()
+    public com.classwright.core.CodeBuilder loadArgument(int)
+    public com.classwright.core.CodeBuilder loadThis()
+    public com.classwright.core.CodeBuilder lookupSwitch(int[], java.util.function.IntConsumer, java.lang.Runnable)
+    public com.classwright.core.CodeBuilder newArray(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder newInstance(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder packArgumentsIntoArray()
+    public com.classwright.core.CodeBuilder pop()
+    public com.classwright.core.CodeBuilder pushClassConstant(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder pushDefault(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder pushDouble(double)
+    public com.classwright.core.CodeBuilder pushFloat(float)
+    public com.classwright.core.CodeBuilder pushInt(int)
+    public com.classwright.core.CodeBuilder pushLong(long)
+    public com.classwright.core.CodeBuilder pushNull()
+    public com.classwright.core.CodeBuilder pushString(java.lang.String)
+    public com.classwright.core.CodeBuilder putField(java.lang.String, java.lang.String, com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder putStatic(java.lang.String, java.lang.String, com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder returnValue()
+    public com.classwright.core.CodeBuilder returnValue(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder shiftRightUnsigned()
+    public com.classwright.core.CodeBuilder store(int, com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder subtract(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder tableSwitch(int, int, java.util.function.IntConsumer, java.lang.Runnable)
+    public com.classwright.core.CodeBuilder throwException()
+    public com.classwright.core.CodeBuilder tryCatch(java.lang.Runnable, com.classwright.core.CwType, java.lang.Runnable)
+    public com.classwright.core.CodeBuilder unbox(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder unboxOrDefault(com.classwright.core.CwType)
+    public com.classwright.core.CodeBuilder unpackArrayIntoArguments(int, java.util.List<com.classwright.core.CwType>)
+    public com.classwright.core.CodeBuilder whileLoop(java.lang.Runnable, java.lang.Runnable)
+    public int declareLocal(com.classwright.core.CwType)
+
+public static enum com.classwright.core.CodeBuilder$IntTest
+    public static com.classwright.core.CodeBuilder$IntTest valueOf(java.lang.String)
+    public static com.classwright.core.CodeBuilder$IntTest[] values()
+    public static final com.classwright.core.CodeBuilder$IntTest AT_LEAST_ZERO
+    public static final com.classwright.core.CodeBuilder$IntTest AT_MOST_ZERO
+    public static final com.classwright.core.CodeBuilder$IntTest EQUAL_TO_ZERO
+    public static final com.classwright.core.CodeBuilder$IntTest GREATER_THAN_ZERO
+    public static final com.classwright.core.CodeBuilder$IntTest LESS_THAN_ZERO
+    public static final com.classwright.core.CodeBuilder$IntTest NOT_ZERO
+
+public class com.classwright.core.CodeGenerationException extends com.classwright.ClasswrightException
+    public <init>(java.lang.String)
+    public <init>(java.lang.String, java.lang.Throwable)
+
+public final class com.classwright.core.ConstantPool
+    public <init>()
+    public int classEntry(com.classwright.core.CwType)
+    public int classEntry(java.lang.String)
+    public int count()
+    public int doubleConstant(double)
+    public int fieldRef(java.lang.String, java.lang.String, java.lang.String)
+    public int floatConstant(float)
+    public int integer(int)
+    public int interfaceMethodRef(java.lang.String, java.lang.String, java.lang.String)
+    public int longConstant(long)
+    public int methodHandle(int, java.lang.String, java.lang.String, java.lang.String, boolean)
+    public int methodRef(java.lang.String, java.lang.String, java.lang.String)
+    public int methodType(java.lang.String)
+    public int nameAndType(java.lang.String, java.lang.String)
+    public int stringConstant(java.lang.String)
+    public int utf8(java.lang.String)
+    public static final int REF_GET_FIELD = 1
+    public static final int REF_GET_STATIC = 2
+    public static final int REF_INVOKE_INTERFACE = 9
+    public static final int REF_INVOKE_SPECIAL = 7
+    public static final int REF_INVOKE_STATIC = 6
+    public static final int REF_INVOKE_VIRTUAL = 5
+    public static final int REF_NEW_INVOKE_SPECIAL = 8
+    public static final int REF_PUT_FIELD = 3
+    public static final int REF_PUT_STATIC = 4
+
+public final class com.classwright.core.CwClassWriter
+    public byte[] toByteArray()
+    public com.classwright.core.ConstantPool constantPool()
+    public com.classwright.core.CwClassWriter annotations(java.lang.annotation.Annotation[])
+    public com.classwright.core.CwClassWriter genericSignature(java.lang.String)
+    public com.classwright.core.CwClassWriter sourceFile(java.lang.String)
+    public com.classwright.core.CwClassWriter version(int)
+    public com.classwright.core.FieldBuilder field(int, java.lang.String, com.classwright.core.CwType)
+    public com.classwright.core.MethodBuilder constructor(int, com.classwright.core.CwMethodType)
+    public com.classwright.core.MethodBuilder method(int, java.lang.String, com.classwright.core.CwMethodType)
+    public com.classwright.core.MethodBuilder staticInitializer()
+    public java.lang.String internalName()
+    public java.lang.String superInternalName()
+    public static com.classwright.core.CwClassWriter of(int, java.lang.String, java.lang.String, java.lang.String[])
+    public static com.classwright.core.CwClassWriter ofInterface(int, java.lang.String, java.lang.String[])
+
+public final class com.classwright.core.CwMethodType
+    public boolean equals(java.lang.Object)
+    public com.classwright.core.CwType returnType()
+    public int firstFreeSlot(boolean)
+    public int hashCode()
+    public int parameterCount()
+    public int parameterSlot(int, boolean)
+    public int parameterSlots()
+    public java.lang.String descriptor()
+    public java.lang.String toString()
+    public java.util.List<com.classwright.core.CwType> parameterTypes()
+    public static com.classwright.core.CwMethodType fromDescriptor(java.lang.String)
+    public static com.classwright.core.CwMethodType of(com.classwright.core.CwType, com.classwright.core.CwType[])
+    public static com.classwright.core.CwMethodType of(com.classwright.core.CwType, java.util.List<com.classwright.core.CwType>)
+    public static com.classwright.core.CwMethodType of(java.lang.Class<?>, java.lang.Class<?>[])
+    public static com.classwright.core.CwMethodType of(java.lang.reflect.Constructor<?>)
+    public static com.classwright.core.CwMethodType of(java.lang.reflect.Method)
+    public static final int MAX_ARGUMENT_SLOTS = 255
+    public void validateArity(boolean)
+
+public final class com.classwright.core.CwType
+    public boolean equals(java.lang.Object)
+    public boolean isArray()
+    public boolean isIntLike()
+    public boolean isPrimitive()
+    public boolean isReference()
+    public boolean isVoid()
+    public com.classwright.core.CwType boxed()
+    public com.classwright.core.CwType componentType()
+    public com.classwright.core.CwType$Sort sort()
+    public int arrayLoadOpcode()
+    public int arrayStoreOpcode()
+    public int dimensions()
+    public int hashCode()
+    public int loadOpcode()
+    public int newArrayTypeCode()
+    public int returnOpcode()
+    public int slots()
+    public int storeOpcode()
+    public java.lang.String className()
+    public java.lang.String descriptor()
+    public java.lang.String internalName()
+    public java.lang.String toString()
+    public static com.classwright.core.CwType arrayOf(com.classwright.core.CwType)
+    public static com.classwright.core.CwType fromDescriptor(java.lang.String)
+    public static com.classwright.core.CwType objectType(java.lang.String)
+    public static com.classwright.core.CwType of(java.lang.Class<?>)
+    public static final com.classwright.core.CwType BOOLEAN
+    public static final com.classwright.core.CwType BYTE
+    public static final com.classwright.core.CwType CHAR
+    public static final com.classwright.core.CwType CLASS
+    public static final com.classwright.core.CwType DOUBLE
+    public static final com.classwright.core.CwType FLOAT
+    public static final com.classwright.core.CwType INT
+    public static final com.classwright.core.CwType LONG
+    public static final com.classwright.core.CwType OBJECT
+    public static final com.classwright.core.CwType OBJECT_ARRAY
+    public static final com.classwright.core.CwType SHORT
+    public static final com.classwright.core.CwType STRING
+    public static final com.classwright.core.CwType THROWABLE
+    public static final com.classwright.core.CwType VOID
+
+public static enum com.classwright.core.CwType$Sort
+    public static com.classwright.core.CwType$Sort valueOf(java.lang.String)
+    public static com.classwright.core.CwType$Sort[] values()
+    public static final com.classwright.core.CwType$Sort ARRAY
+    public static final com.classwright.core.CwType$Sort BOOLEAN
+    public static final com.classwright.core.CwType$Sort BYTE
+    public static final com.classwright.core.CwType$Sort CHAR
+    public static final com.classwright.core.CwType$Sort DOUBLE
+    public static final com.classwright.core.CwType$Sort FLOAT
+    public static final com.classwright.core.CwType$Sort INT
+    public static final com.classwright.core.CwType$Sort LONG
+    public static final com.classwright.core.CwType$Sort OBJECT
+    public static final com.classwright.core.CwType$Sort SHORT
+    public static final com.classwright.core.CwType$Sort VOID
+
+public final class com.classwright.core.FieldBuilder
+    public com.classwright.core.CwType type()
+    public com.classwright.core.FieldBuilder genericSignature(java.lang.String)
+    public java.lang.String name()
+
+public final class com.classwright.core.MethodBuilder
+    public com.classwright.core.CodeBuilder code()
+    public com.classwright.core.CwMethodType type()
+    public com.classwright.core.MethodBuilder annotations(java.lang.annotation.Annotation[])
+    public com.classwright.core.MethodBuilder copyMetadataFrom(java.lang.reflect.Method)
+    public com.classwright.core.MethodBuilder genericSignature(java.lang.String)
+    public com.classwright.core.MethodBuilder genericSignatureFrom(java.lang.reflect.Method)
+    public com.classwright.core.MethodBuilder parameterAnnotations(java.lang.annotation.Annotation[][])
+    public com.classwright.core.MethodBuilder throwsException(java.lang.String)
+    public java.lang.String name()
+
+@Internal com.classwright.core.RuntimeConstants (generated-code runtime ABI; no compatibility promise)
+
+public final class com.classwright.proxy.AheadOfTime
+    public static com.classwright.proxy.AheadOfTime$Generated generate(com.classwright.proxy.ProxyBlueprint)
+    public static final int RUNTIME_ABI = 1
+    public static final java.lang.String INDEX_RESOURCE = "META-INF/classwright/proxies.index"
+    public static java.util.List<com.classwright.proxy.AheadOfTime$Generated> writeTo(java.nio.file.Path, java.util.List<com.classwright.proxy.ProxyBlueprint>)
+
+public static final record com.classwright.proxy.AheadOfTime$Generated
+    public <init>(com.classwright.proxy.ProxyBlueprint, java.lang.String, byte[], java.lang.String)
+    public byte[] classBytes()
+    public com.classwright.proxy.ProxyBlueprint blueprint()
+    public final boolean equals(java.lang.Object)
+    public final int hashCode()
+    public final java.lang.String toString()
+    public java.lang.String className()
+    public java.lang.String relativePath()
+    public java.lang.String routingFingerprint()
+
+public final class com.classwright.proxy.AotProxies
+    public static boolean isEmpty(java.lang.Class<?>)
+    public static int size(java.lang.Class<?>)
+    public static java.lang.String describe(java.lang.Class<?>)
+    public static java.util.Optional<java.lang.Class<?>> find(java.lang.Class<?>, java.lang.String)
+
+public interface com.classwright.proxy.Callback
+
+public interface com.classwright.proxy.CallbackFilter
+    public abstract boolean equals(java.lang.Object)
+    public abstract int accept(java.lang.reflect.Method)
+    public abstract int hashCode()
+
+@Internal com.classwright.proxy.CallbackRegistry (generated-code runtime ABI; no compatibility promise)
+
+public interface com.classwright.proxy.Dispatcher implements com.classwright.proxy.Callback
+    public abstract java.lang.Object loadObject() throws java.lang.Exception
+
+public class com.classwright.proxy.Enhancer
+    public <init>()
+    public java.lang.Class<?> createClass()
+    public java.lang.Object create()
+    public java.lang.Object create(java.lang.Class<?>[], java.lang.Object[])
+    public java.lang.String describeSkippedMethods()
+    public static java.lang.Object create(java.lang.Class<?>, com.classwright.proxy.Callback)
+    public static java.lang.Object create(java.lang.Class<?>, java.lang.Class<?>[], com.classwright.proxy.Callback)
+    public static java.util.List<java.lang.reflect.Method> proxiedMethods(java.lang.Class<?>, java.lang.Class<?>[])
+    public static void registerCallbacks(java.lang.Class<?>, com.classwright.proxy.Callback[])
+    public static void registerStaticCallbacks(java.lang.Class<?>, com.classwright.proxy.Callback[])
+    public void setCallback(com.classwright.proxy.Callback)
+    public void setCallbackFilter(com.classwright.proxy.CallbackFilter)
+    public void setCallbackTypes(java.lang.Class<?>[])
+    public void setCallbacks(com.classwright.proxy.Callback[])
+    public void setCopyAnnotations(boolean)
+    public void setDefinitionStrategy(com.classwright.runtime.DefinitionStrategy)
+    public void setInterceptDuringConstruction(boolean)
+    public void setInterfaces(java.lang.Class<?>[])
+    public void setNamingConvention(com.classwright.proxy.NamingConvention)
+    public void setSuperclass(java.lang.Class<?>)
+    public void setUseCache(boolean)
+    public void setUseFactory(boolean)
+
+public interface com.classwright.proxy.Factory
+    public abstract com.classwright.proxy.Callback getCallback(int)
+    public abstract com.classwright.proxy.Callback[] getCallbacks()
+    public abstract java.lang.Object newInstance(com.classwright.proxy.Callback)
+    public abstract java.lang.Object newInstance(com.classwright.proxy.Callback[])
+    public abstract java.lang.Object newInstance(java.lang.Class<?>[], java.lang.Object[], com.classwright.proxy.Callback[])
+    public abstract void setCallback(int, com.classwright.proxy.Callback)
+    public abstract void setCallbacks(com.classwright.proxy.Callback[])
+
+public interface com.classwright.proxy.FixedValue implements com.classwright.proxy.Callback
+    public abstract java.lang.Object loadObject() throws java.lang.Exception
+
+public class com.classwright.proxy.InterfaceMaker
+    public <init>()
+    public com.classwright.proxy.InterfaceMaker add(java.lang.String, java.lang.Class<?>, java.lang.Class<?>[])
+    public com.classwright.proxy.InterfaceMaker add(java.lang.reflect.Method)
+    public com.classwright.proxy.InterfaceMaker addAll(java.lang.Class<?>)
+    public com.classwright.proxy.InterfaceMaker setName(java.lang.String)
+    public com.classwright.proxy.InterfaceMaker setNeighbour(java.lang.Class<?>)
+    public java.lang.Class<?> create()
+
+public interface com.classwright.proxy.InvocationHandler implements com.classwright.proxy.Callback
+    public abstract java.lang.Object invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[]) throws java.lang.Throwable
+
+public interface com.classwright.proxy.LazyLoader implements com.classwright.proxy.Callback
+    public abstract java.lang.Object loadObject() throws java.lang.Exception
+
+public interface com.classwright.proxy.MethodInterceptor implements com.classwright.proxy.Callback
+    public abstract java.lang.Object intercept(java.lang.Object, java.lang.reflect.Method, java.lang.Object[], com.classwright.proxy.MethodProxy) throws java.lang.Throwable
+
+public final class com.classwright.proxy.MethodProxy
+    public boolean hasSuperImplementation()
+    public int getSuperIndex()
+    public java.lang.Object attachment()
+    public java.lang.Object invoke(java.lang.Object, java.lang.Object[]) throws java.lang.Throwable
+    public java.lang.Object invokeSuper(java.lang.Object, java.lang.Object[]) throws java.lang.Throwable
+    public java.lang.String getDescriptor()
+    public java.lang.String getName()
+    public java.lang.String toString()
+    public void setAttachment(java.lang.Object)
+
+public abstract class com.classwright.proxy.Mixin
+    protected <init>()
+    public com.classwright.proxy.Mixin newInstance(java.lang.Object[])
+    public final java.lang.Object[] getDelegates()
+    public static com.classwright.proxy.Mixin create(java.lang.Class<?>[], java.lang.Object[])
+    public static com.classwright.proxy.Mixin create(java.lang.Object[])
+    public static java.util.List<java.lang.Class<?>> interfacesFor(java.lang.Object[])
+
+public final record com.classwright.proxy.NamingConvention
+    public <init>(java.lang.String, java.lang.String)
+    public final boolean equals(java.lang.Object)
+    public final int hashCode()
+    public final java.lang.String toString()
+    public java.lang.String classNameSuffix()
+    public java.lang.String memberPrefix()
+    public static final com.classwright.proxy.NamingConvention CGLIB_COMPATIBLE
+    public static final com.classwright.proxy.NamingConvention DEFAULT
+
+public interface com.classwright.proxy.NoOp implements com.classwright.proxy.Callback
+    public static final com.classwright.proxy.NoOp INSTANCE
+
+public final class com.classwright.proxy.Proxy implements java.io.Serializable
+    public static boolean isProxyClass(java.lang.Class<?>)
+    public static com.classwright.proxy.InvocationHandler getInvocationHandler(java.lang.Object)
+    public static java.lang.Class<?> getProxyClass(java.lang.ClassLoader, java.lang.Class<?>[])
+    public static java.lang.Object newProxyInstance(java.lang.ClassLoader, java.lang.Class<?>[], com.classwright.proxy.InvocationHandler)
+
+public final class com.classwright.proxy.ProxyBlueprint
+    public java.lang.String generatedClassName()
+    public java.lang.String key()
+    public java.lang.String toString()
+    public static com.classwright.proxy.ProxyBlueprint$Builder of(java.lang.Class<?>)
+
+public static final class com.classwright.proxy.ProxyBlueprint$Builder
+    public com.classwright.proxy.ProxyBlueprint build()
+    public com.classwright.proxy.ProxyBlueprint$Builder callbacks(java.lang.Class<?>[])
+    public com.classwright.proxy.ProxyBlueprint$Builder copyAnnotations(boolean)
+    public com.classwright.proxy.ProxyBlueprint$Builder filteredBy(java.lang.Class<? extends com.classwright.proxy.CallbackFilter>)
+    public com.classwright.proxy.ProxyBlueprint$Builder implementing(java.lang.Class<?>[])
+    public com.classwright.proxy.ProxyBlueprint$Builder interceptDuringConstruction(boolean)
+    public com.classwright.proxy.ProxyBlueprint$Builder naming(com.classwright.proxy.NamingConvention)
+    public com.classwright.proxy.ProxyBlueprint$Builder useFactory(boolean)
+
+public interface com.classwright.proxy.ProxyRefDispatcher implements com.classwright.proxy.Callback
+    public abstract java.lang.Object loadObject(java.lang.Object) throws java.lang.Exception
+
+@Internal com.classwright.proxy.ProxySupport (generated-code runtime ABI; no compatibility promise)
+
+@Internal com.classwright.proxy.SuperDispatcher (generated-code runtime ABI; no compatibility promise)
+
+public abstract class com.classwright.reflect.ConstructorDelegate
+    protected <init>()
+    public static com.classwright.reflect.ConstructorDelegate create(java.lang.Class<?>, java.lang.Class<?>)
+
+public abstract class com.classwright.reflect.FastClass
+    protected <init>()
+    public abstract java.lang.Object invoke(int, java.lang.Object, java.lang.Object[]) throws java.lang.reflect.InvocationTargetException
+    public abstract java.lang.Object newInstance(int, java.lang.Object[]) throws java.lang.reflect.InvocationTargetException
+    public com.classwright.reflect.FastConstructor getConstructor(java.lang.Class<?>[])
+    public com.classwright.reflect.FastConstructor getConstructor(java.lang.reflect.Constructor<?>)
+    public com.classwright.reflect.FastMethod getMethod(java.lang.String, java.lang.Class<?>[])
+    public com.classwright.reflect.FastMethod getMethod(java.lang.reflect.Method)
+    public int getConstructorIndex(java.lang.Class<?>[])
+    public int getIndex(java.lang.String, java.lang.Class<?>[])
+    public int getIndex(java.lang.String, java.lang.String)
+    public int getIndex(java.lang.reflect.Method)
+    public int getMaxIndex()
+    public java.lang.Class<?> getJavaClass()
+    public java.lang.Object invoke(java.lang.String, java.lang.Class<?>[], java.lang.Object, java.lang.Object[]) throws java.lang.reflect.InvocationTargetException
+    public java.lang.Object newInstance() throws java.lang.reflect.InvocationTargetException
+    public java.lang.Object newInstance(java.lang.Class<?>[], java.lang.Object[]) throws java.lang.reflect.InvocationTargetException
+    public java.lang.String getName()
+    public java.lang.String toString()
+    public java.util.List<java.lang.reflect.Constructor<?>> getConstructors()
+    public java.util.List<java.lang.reflect.Method> getMethods()
+    public static com.classwright.reflect.FastClass create(java.lang.Class<?>)
+
+public final class com.classwright.reflect.FastConstructor extends com.classwright.reflect.FastMember
+    public java.lang.Class<?>[] getExceptionTypes()
+    public java.lang.Class<?>[] getParameterTypes()
+    public java.lang.Object newInstance(java.lang.Object[]) throws java.lang.reflect.InvocationTargetException
+    public java.lang.reflect.Constructor<?> getJavaConstructor()
+
+public abstract class com.classwright.reflect.FastMember
+    public abstract java.lang.Class<?>[] getExceptionTypes()
+    public abstract java.lang.Class<?>[] getParameterTypes()
+    public boolean equals(java.lang.Object)
+    public com.classwright.reflect.FastClass getFastClass()
+    public int getIndex()
+    public int getModifiers()
+    public int hashCode()
+    public java.lang.Class<?> getDeclaringClass()
+    public java.lang.String getName()
+    public java.lang.String toString()
+
+public final class com.classwright.reflect.FastMethod extends com.classwright.reflect.FastMember
+    public java.lang.Class<?> getReturnType()
+    public java.lang.Class<?>[] getExceptionTypes()
+    public java.lang.Class<?>[] getParameterTypes()
+    public java.lang.Object invoke(java.lang.Object, java.lang.Object[]) throws java.lang.reflect.InvocationTargetException
+    public java.lang.reflect.Method getJavaMethod()
+
+public abstract class com.classwright.reflect.MethodDelegate
+    protected <init>()
+    public com.classwright.reflect.MethodDelegate newInstance(java.lang.Object)
+    public final java.lang.Object getTarget()
+    public static com.classwright.reflect.MethodDelegate create(java.lang.Object, java.lang.String, java.lang.Class<?>)
+    public static com.classwright.reflect.MethodDelegate createStatic(java.lang.Class<?>, java.lang.String, java.lang.Class<?>)
+
+public abstract class com.classwright.reflect.MulticastDelegate
+    protected <init>()
+    public com.classwright.reflect.MulticastDelegate add(java.lang.Object)
+    public com.classwright.reflect.MulticastDelegate remove(java.lang.Object)
+    public final int size()
+    public final java.lang.Object[] getTargets()
+    public static com.classwright.reflect.MulticastDelegate create(java.lang.Class<?>)
+
+public final class com.classwright.runtime.Capabilities
+    public static boolean constructorSkipping()
+    public static boolean hiddenClasses()
+    public static java.lang.String constructorSkippingMechanism()
+    public static java.lang.String describe()
+    public static void main(java.lang.String[])
+
+public final class com.classwright.runtime.ClassDefiner
+    public boolean canOverridePackagePrivate()
+    public com.classwright.runtime.DefinedClass define(byte[])
+    public com.classwright.runtime.DefinitionSite site()
+    public com.classwright.runtime.DefinitionStrategy strategy()
+    public java.lang.String generatedNameFor(java.lang.Class<?>, java.lang.String)
+    public java.lang.String generatedNameInPackage(java.lang.String)
+    public java.lang.String packageName()
+    public java.lang.String toString()
+    public static com.classwright.runtime.ClassDefiner alongside(java.lang.Class<?>)
+    public static com.classwright.runtime.ClassDefiner using(java.lang.Class<?>, com.classwright.runtime.DefinitionStrategy)
+    public static final java.lang.String DUMP_DIRECTORY_PROPERTY = "classwright.dumpDir"
+
+public final class com.classwright.runtime.ClasswrightScope implements java.lang.AutoCloseable
+    public boolean isClosed()
+    public boolean isFullyReclaimable()
+    public com.classwright.runtime.DefinedClass define(com.classwright.runtime.ClassDefiner, byte[])
+    public com.classwright.runtime.DefinedClass define(java.lang.Class<?>, byte[])
+    public int size()
+    public java.lang.String toString()
+    public static com.classwright.runtime.ClasswrightScope open()
+    public static com.classwright.runtime.ClasswrightScope open(java.lang.String)
+    public void close()
+
+public final record com.classwright.runtime.DefinedClass
+    public <init>(java.lang.Class<?>, java.lang.invoke.MethodHandles$Lookup, com.classwright.runtime.DefinitionStrategy)
+    public boolean hasResolvableName()
+    public boolean isUnloadable()
+    public com.classwright.runtime.DefinitionStrategy strategy()
+    public final boolean equals(java.lang.Object)
+    public final int hashCode()
+    public final java.lang.String toString()
+    public java.lang.Class<?> type()
+    public java.lang.invoke.MethodHandle constructor(java.lang.Class<?>[])
+    public java.lang.invoke.MethodHandles$Lookup lookup()
+    public java.util.Optional<java.lang.invoke.MethodHandles$Lookup> maybeLookup()
+
+public final record com.classwright.runtime.DefinitionSite
+    public <init>(java.lang.Class<?>, java.lang.invoke.MethodHandles$Lookup)
+    public boolean canDefineHiddenClass()
+    public boolean canOverridePackagePrivate()
+    public boolean hasFullPrivilegeLookup()
+    public final boolean equals(java.lang.Object)
+    public final int hashCode()
+    public final java.lang.String toString()
+    public java.lang.Class<?> neighbour()
+    public java.lang.ClassLoader classLoader()
+    public java.lang.String explainMissingLookup()
+    public java.lang.String packageName()
+    public java.lang.invoke.MethodHandles$Lookup lookup()
+    public java.util.Optional<java.lang.invoke.MethodHandles$Lookup> maybeLookup()
+    public static com.classwright.runtime.DefinitionSite of(java.lang.Class<?>)
+    public static void forget(java.lang.Class<?>)
+
+public interface com.classwright.runtime.DefinitionStrategy
+    public abstract boolean isUsableAt(com.classwright.runtime.DefinitionSite)
+    public abstract boolean producesResolvableNames()
+    public abstract boolean producesUnloadableClasses()
+    public abstract com.classwright.runtime.DefinedClass define(com.classwright.runtime.DefinitionSite, byte[])
+    public abstract java.lang.String name()
+    public java.lang.Object cacheIdentity()
+    public static com.classwright.runtime.DefinitionStrategy childLoader()
+    public static com.classwright.runtime.DefinitionStrategy hidden()
+    public static com.classwright.runtime.DefinitionStrategy named()
+
+public static final class com.classwright.runtime.DefinitionStrategy$ChildLoader implements com.classwright.runtime.DefinitionStrategy
+    public <init>()
+    public <init>(java.lang.ClassLoader)
+    public boolean isUsableAt(com.classwright.runtime.DefinitionSite)
+    public boolean producesResolvableNames()
+    public boolean producesUnloadableClasses()
+    public com.classwright.runtime.DefinedClass define(com.classwright.runtime.DefinitionSite, byte[])
+    public java.lang.Object cacheIdentity()
+    public java.lang.String name()
+
+public static final class com.classwright.runtime.DefinitionStrategy$Hidden implements com.classwright.runtime.DefinitionStrategy
+    public boolean isUsableAt(com.classwright.runtime.DefinitionSite)
+    public boolean producesResolvableNames()
+    public boolean producesUnloadableClasses()
+    public com.classwright.runtime.DefinedClass define(com.classwright.runtime.DefinitionSite, byte[])
+    public java.lang.String name()
+
+public static final class com.classwright.runtime.DefinitionStrategy$Named implements com.classwright.runtime.DefinitionStrategy
+    public boolean isUsableAt(com.classwright.runtime.DefinitionSite)
+    public boolean producesResolvableNames()
+    public boolean producesUnloadableClasses()
+    public com.classwright.runtime.DefinedClass define(com.classwright.runtime.DefinitionSite, byte[])
+    public java.lang.String name()
+
+public final class com.classwright.runtime.GenerationCache
+    public static boolean isCached(java.lang.Class<?>, java.lang.Object)
+    public static com.classwright.runtime.GenerationCache$Statistics statistics()
+    public static int purgeCollectedEntries(java.lang.Class<?>)
+    public static java.lang.Class<?> computeIfAbsent(java.lang.Class<?>, java.lang.Object, java.util.function.Supplier<java.lang.Class<?>>)
+    public static void invalidate(java.lang.Class<?>)
+    public static void resetStatistics()
+
+public static interface com.classwright.runtime.GenerationCache$ProbeKey
+    public abstract java.lang.Object retained()
+
+public static interface com.classwright.runtime.GenerationCache$StaleKey
+    public abstract boolean isStale()
+
+public static final record com.classwright.runtime.GenerationCache$Statistics
+    public <init>(long, long, long)
+    public double hitRate()
+    public final boolean equals(java.lang.Object)
+    public final int hashCode()
+    public java.lang.String toString()
+    public long hits()
+    public long misses()
+    public long regeneratedAfterCollection()
+
+public static final class com.classwright.runtime.GenerationCache$WeakPart
+    public boolean equals(java.lang.Object)
+    public boolean isStale()
+    public int hashCode()
+    public static boolean anyStale(java.util.List<com.classwright.runtime.GenerationCache$WeakPart>)
+    public static com.classwright.runtime.GenerationCache$WeakPart of(java.lang.Class<?>)
+    public static java.util.List<com.classwright.runtime.GenerationCache$WeakPart> ofClasses(java.util.List<java.lang.Class<?>>)
+
+public final class com.classwright.runtime.Instantiator
+    public java.lang.Class<?> type()
+    public java.lang.Object allocateWithoutConstructor()
+    public java.lang.Object newInstance()
+    public java.lang.Object newInstance(java.lang.Class<?>[], java.lang.Object[])
+    public static com.classwright.runtime.Instantiator forClass(com.classwright.runtime.DefinedClass)
+    public static com.classwright.runtime.Instantiator forGenerated(java.lang.Class<?>)
+    public static com.classwright.runtime.Instantiator register(com.classwright.runtime.DefinedClass)
+
+public final class com.classwright.runtime.LookupResolver
+    public static java.lang.invoke.MethodHandles$Lookup resolve(java.lang.Class<?>)
+    public static java.util.Optional<java.lang.invoke.MethodHandles$Lookup> tryResolve(java.lang.Class<?>)

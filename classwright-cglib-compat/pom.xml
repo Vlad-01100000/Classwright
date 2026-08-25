@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.classwright</groupId>
+        <artifactId>classwright-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>classwright-cglib-compat</artifactId>
+    <name>Classwright :: CGLib compatibility</name>
+    <description>Implements the net.sf.cglib API on top of Classwright, so migrating is a change
+        of dependency coordinate and nothing else.</description>
+
+    <dependencies>
+        <!--
+          The only runtime dependency, and it is our own. Note that CGLib itself is deliberately
+          NOT here: this module *replaces* it, and having both on a classpath is a duplicate-class
+          situation that the coexistence guard detects and refuses.
+        -->
+        <dependency>
+            <groupId>com.classwright</groupId>
+            <artifactId>classwright</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>ban-real-cglib</id>
+                        <goals><goal>enforce</goal></goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <message>
+                                        This module defines the net.sf.cglib packages itself.
+                                        Having the real CGLib on the same classpath means two
+                                        definitions of every class, and which one wins is decided
+                                        by classpath order.
+                                    </message>
+                                    <excludes>
+                                        <exclude>cglib:cglib</exclude>
+                                        <exclude>cglib:cglib-nodep</exclude>
+                                    </excludes>
+                                    <searchTransitive>true</searchTransitive>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Automatic-Module-Name>com.classwright.cglib.compat</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <!--
+                  The parity gate's reference material. CGLib 3.3.0 (and the ASM it links against)
+                  is copied to target/parity as plain files, never onto any classpath - the
+                  enforcer rule above stays honest. CglibApiParityTest loads it in an isolated
+                  loader and diffs its public/protected API against this module's classes; every
+                  gap must appear in api/cglib-parity-allowlist.txt, so "easy to migrate" is a
+                  machine-checked property rather than a hope.
+                -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-parity-reference</id>
+                        <phase>generate-test-resources</phase>
+                        <goals><goal>copy</goal></goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>cglib</groupId>
+                                    <artifactId>cglib</artifactId>
+                                    <version>${cglib.version}</version>
+                                    <destFileName>cglib-reference.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ow2.asm</groupId>
+                                    <artifactId>asm</artifactId>
+                                    <version>7.1</version>
+                                    <destFileName>asm-reference.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/parity</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

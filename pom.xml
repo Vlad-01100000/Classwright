@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      The standalone Java 17 release line: the development reactor's parent, trimmed to the two
+      published library artifacts — the core and the net.sf.cglib compatibility shim. The AOT
+      Maven plugin, the benchmark suite and the TCK live in the development repository, and the
+      properties that existed only for them are gone with them. Everything load-bearing is
+      unchanged: the pinned plugin versions, the enforcer gates, the release profile, the
+      toolchain profile.
+    -->
+    <groupId>com.classwright</groupId>
+    <artifactId>classwright-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Classwright</name>
+    <description>A zero-dependency, from-scratch runtime code generation library for the JVM; a
+        replacement for CGLib built to survive JDK version transitions.</description>
+    <url>https://github.com/classwright/classwright</url>
+    <inceptionYear>2026</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- Required by Maven Central. -->
+    <developers>
+        <developer>
+            <name>The Classwright authors</name>
+            <url>https://github.com/classwright/classwright</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/classwright/classwright.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/classwright/classwright.git</developerConnection>
+        <url>https://github.com/classwright/classwright</url>
+        <!-- On the release-prep commit (whose version is X.Y.Z) this renders as the exact tag
+             the release process pushes, so published Maven metadata names the real tag. -->
+        <tag>v${project.version}</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/classwright/classwright/issues</url>
+    </issueManagement>
+
+    <modules>
+        <module>classwright</module>
+        <module>classwright-cglib-compat</module>
+    </modules>
+
+    <properties>
+        <!--
+          The baseline. `release` (not source/target) is deliberate: it also validates against the
+          JDK 17 API *signature* set, so building on a newer JDK cannot silently introduce a call to
+          an API that does not exist on 17.
+        -->
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Reproducible builds: a fixed timestamp makes jar contents byte-identical across runs. -->
+        <project.build.outputTimestamp>2026-01-01T00:00:00Z</project.build.outputTimestamp>
+
+        <!-- Test-scope only. Nothing here ever reaches a consumer's runtime classpath. -->
+        <junit.version>5.11.4</junit.version>
+        <!--
+          The library this project replaces: the core's differential tests use it as a
+          behavioural oracle (test scope), and the compatibility module's parity gate diffs
+          against its jar as plain reference files, never on a classpath.
+        -->
+        <cglib.version>3.3.0</cglib.version>
+
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+        <maven.resources.plugin.version>3.4.0</maven.resources.plugin.version>
+        <maven.install.plugin.version>3.1.4</maven.install.plugin.version>
+        <maven.deploy.plugin.version>3.1.4</maven.deploy.plugin.version>
+        <maven.dependency.plugin.version>3.7.0</maven.dependency.plugin.version>
+        <maven.site.plugin.version>3.12.1</maven.site.plugin.version>
+        <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
+        <maven.failsafe.plugin.version>3.5.2</maven.failsafe.plugin.version>
+        <maven.enforcer.plugin.version>3.5.0</maven.enforcer.plugin.version>
+        <maven.jar.plugin.version>3.4.2</maven.jar.plugin.version>
+        <maven.toolchains.plugin.version>3.2.0</maven.toolchains.plugin.version>
+        <maven.clean.plugin.version>3.4.0</maven.clean.plugin.version>
+        <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
+        <maven.javadoc.plugin.version>3.11.2</maven.javadoc.plugin.version>
+        <maven.gpg.plugin.version>3.2.7</maven.gpg.plugin.version>
+        <central.publishing.plugin.version>0.7.0</central.publishing.plugin.version>
+        <japicmp.plugin.version>0.23.1</japicmp.plugin.version>
+
+        <!--
+          The published version japicmp compares against. Bump on every release. Until the first
+          release there is nothing to compare with; pass japicmp.ignoreMissingOldVersion=true for
+          exactly that case (baseline 0.0.0) and never otherwise — a missing baseline must FAIL,
+          or a typo turns the compatibility gate into a silent no-op.
+        -->
+        <japicmp.baseline.version>0.0.0</japicmp.baseline.version>
+        <japicmp.ignoreMissingOldVersion>false</japicmp.ignoreMissingOldVersion>
+
+        <!--
+          What japicmp is allowed to reject depends on which version is being released — the
+          documented SemVer policy in COMPATIBILITY.md §1, not one fixed strictness. The defaults
+          are the strictest profile (any incompatibility fails), which is the right behaviour for
+          local `-Prelease` runs; a release pipeline derives them from the (baseline, version)
+          pair. japicmp's role is confined to detecting INCOMPATIBILITY: its own
+          semantic-versioning switch classifies additive API as PATCH-level (fixture-proven in
+          the development repository), so additive legality is enforced separately, against the
+          API snapshot embedded in the baseline jar.
+        -->
+        <japicmp.breakOnBinaryIncompatible>true</japicmp.breakOnBinaryIncompatible>
+        <japicmp.breakOnSourceIncompatible>true</japicmp.breakOnSourceIncompatible>
+
+        <!-- Overridden to true by modules that are never published. None here, today. -->
+        <japicmp.skip>false</japicmp.skip>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                    <configuration>
+                        <compilerArgs>
+                            <arg>-Xlint:all,-serial,-requires-automatic</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven.failsafe.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven.enforcer.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven.jar.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-toolchains-plugin</artifactId>
+                    <version>${maven.toolchains.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven.clean.plugin.version}</version>
+                </plugin>
+                <!--
+                  The rest of the default lifecycle, pinned so no plugin version is ever decided
+                  by whichever Maven happens to run the build. The requirePluginVersions rule
+                  below turns a missing pin into a build failure; the wrapper pins Maven itself.
+                  Together with the fixed outputTimestamp this is what makes a tagged release
+                  rebuildable byte-for-byte years later.
+                -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.resources.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${maven.install.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven.deploy.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven.dependency.plugin.version}</version>
+                </plugin>
+                <!-- The site lifecycle is unused, but requirePluginVersions still sees the
+                     super-POM's binding, so it is pinned rather than special-cased away. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${maven.site.plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-build-environment</id>
+                        <goals><goal>enforce</goal></goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion><version>[3.6.3,)</version></requireMavenVersion>
+                                <requireJavaVersion><version>[17,)</version></requireJavaVersion>
+                                <!-- One version per dependency within a POM, and transitive
+                                     versions may only go up. (Neither rule bans version ranges;
+                                     none are used, but that is convention, not enforcement.) -->
+                                <banDuplicatePomDependencyVersions/>
+                                <requireUpperBoundDeps/>
+                                <!-- Every build-bound plugin must resolve from a version pinned
+                                     in this repository, or the release toolchain drifts with the
+                                     runner image's Maven defaults. -->
+                                <requirePluginVersions>
+                                    <phases>clean,deploy</phases>
+                                </requirePluginVersions>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!--
+          =====================================================================================
+          Release. `mvn -Prelease deploy` produces signed source and javadoc jars, checks binary
+          compatibility against the previous release, and publishes to Maven Central.
+
+          Kept out of the default build on purpose: signing needs a key, and the compatibility
+          check needs the network to fetch the previous artifact. Neither belongs in the loop a
+          contributor runs. Day-to-day API drift is caught by the snapshot gate in PublicApiIT,
+          which needs nothing external and runs on every build.
+          =====================================================================================
+        -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven.source.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals><goal>jar-no-fork</goal></goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${maven.javadoc.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals><goal>jar</goal></goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!--
+                              `all`, with `missing` included rather than excluded. Every public and
+                              protected member is documented, so a missing comment is a real gap and
+                              the build should say so. Excluding `missing` is the usual setting; it
+                              is also how documentation quietly stops being written.
+                            -->
+                            <doclint>all</doclint>
+                            <failOnWarnings>true</failOnWarnings>
+                            <quiet>true</quiet>
+                            <!--
+                              Explicit, because module-info.java lives in its own source root (see
+                              the note in classwright/pom.xml). Finding a module descriptor puts
+                              javadoc into module mode, where it then resolves packages relative to
+                              the module root and finds no sources at all — "No source files for
+                              package com.classwright.beans". Naming the real source root keeps it
+                              in classpath mode.
+                            -->
+                            <sourcepath>${project.basedir}/src/main/java</sourcepath>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven.gpg.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals><goal>sign</goal></goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- No interactive passphrase prompt; CI supplies it via gpg-agent. -->
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+
+                    <!--
+                      The binary-compatibility gate. PublicApiIT catches a *changed* API in the pull
+                      request that changes it; this catches a change that is not permitted at all
+                      for the version being released, judged against the artifact users already
+                      have. The two answer different questions and both are wanted.
+                    -->
+                    <plugin>
+                        <groupId>com.github.siom79.japicmp</groupId>
+                        <artifactId>japicmp-maven-plugin</artifactId>
+                        <version>${japicmp.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>binary-compatibility</id>
+                                <phase>verify</phase>
+                                <goals><goal>cmp</goal></goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <oldVersion>
+                                <dependency>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${japicmp.baseline.version}</version>
+                                </dependency>
+                            </oldVersion>
+                            <parameter>
+                                <ignoreMissingOldVersion>${japicmp.ignoreMissingOldVersion}</ignoreMissingOldVersion>
+                                <onlyModified>true</onlyModified>
+                                <breakBuildOnBinaryIncompatibleModifications>${japicmp.breakOnBinaryIncompatible}</breakBuildOnBinaryIncompatibleModifications>
+                                <breakBuildOnSourceIncompatibleModifications>${japicmp.breakOnSourceIncompatible}</breakBuildOnSourceIncompatibleModifications>
+                                <includes>
+                                    <include>com.classwright</include>
+                                    <include>net.sf.cglib</include>
+                                </includes>
+                                <excludes>
+                                    <!--
+                                      The same three-contract model the API snapshot enforces:
+                                      types annotated @Internal are the generated-code runtime
+                                      ABI, public only because generated classes live in their
+                                      target's package. Freezing them here would forbid exactly
+                                      the implementation changes (ProxySupport, CallbackRegistry,
+                                      SuperDispatcher, the unsafe allocators) that the model
+                                      exists to keep possible. Their compatibility story is
+                                      AheadOfTime.RUNTIME_ABI, not this gate.
+                                    -->
+                                    <exclude>@com.classwright.Internal</exclude>
+                                </excludes>
+                            </parameter>
+                            <skip>${japicmp.skip}</skip>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>${central.publishing.plugin.version}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <!-- Deliberately manual: a release should be looked at before it is
+                                 irreversible. Maven Central publication cannot be undone. -->
+                            <autoPublish>false</autoPublish>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--
+          Auto-activated when ~/.m2/toolchains.xml exists, which pins the compile/test JDK to a real
+          17 regardless of which JDK the shell or IDE happens to point JAVA_HOME at. Without it the
+          build still works on any JDK >= 17 thanks to `release`, but only a true 17 runtime can
+          catch *behavioural* differences, which is exactly the risk profile of a bytecode engine.
+          See toolchains.sample.xml.
+        -->
+        <profile>
+            <id>jdk17-toolchain</id>
+            <activation>
+                <file><exists>${user.home}/.m2/toolchains.xml</exists></file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-toolchains-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals><goal>select-jdk-toolchain</goal></goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <version>17</version>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.classwright</groupId>
+        <artifactId>classwright-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>classwright</artifactId>
+    <name>Classwright :: Core</name>
+    <description>The Classwright library. Zero runtime dependencies, by design and by
+        enforcement.</description>
+
+    <dependencies>
+        <!--
+          NOTHING may appear here with compile or runtime scope, ever. A shipped dependency is the
+          failure mode (F3) that fragmented CGLib into cglib / cglib-nodep / spring-cglib. The
+          enforcer rule below makes that a build failure rather than a code-review convention.
+        -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+          The library Classwright replaces, used as a behavioural oracle by the differential
+          integration test. Test scope, so it never reaches a consumer; the enforcer rule above
+          would fail the build if that ever changed.
+
+          Comparing against the real thing is worth more than any amount of reading its
+          documentation: the questions that matter are what CGLib actually did with a final
+          method, a null return from an interceptor, or an exception thrown inside one, and only
+          running it answers those.
+        -->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <!-- Declaring <resources> replaces the default, so the default comes first. -->
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <!--
+              The reviewed API snapshot travels inside the jar, so a release can diff the
+              baseline's actual published surface against the current one without trusting the
+              repository's history: contract-policy.sh (see .github/scripts) pulls this file out
+              of the baseline jar and judges the change against the SemVer policy. japicmp
+              cannot do this half — its semantic-versioning switch classifies additive API as
+              PATCH-level (fixture-proven), and the policy says additions need MINOR.
+            -->
+            <resource>
+                <directory>api</directory>
+                <targetPath>META-INF/classwright</targetPath>
+                <includes>
+                    <include>classwright.api</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-zero-runtime-dependencies</id>
+                        <goals><goal>enforce</goal></goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <message>
+                                        classwright must ship with zero runtime dependencies.
+                                        Only test- and provided-scoped dependencies are permitted.
+                                        See docs/PLAN.md P0.2.
+                                    </message>
+                                    <!-- groupId:artifactId:version:type:scope -->
+                                    <excludes>
+                                        <exclude>*:*:*:*:compile</exclude>
+                                        <exclude>*:*:*:*:runtime</exclude>
+                                    </excludes>
+                                    <searchTransitive>true</searchTransitive>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+              module-info.java lives in its own source root rather than alongside the code.
+
+              When a module descriptor sits in src/main/java, Maven compiles the *tests* as part of
+              that module too. Test code then inherits the module's `requires` list, and since
+              Classwright deliberately requires nothing beyond java.base, tests could not use so
+              much as an XML parser. The usual workaround is to add `requires` entries the library
+              does not actually need, which makes the published module descriptor lie about its
+              dependencies.
+
+              Compiling the descriptor separately keeps both main and test compilation on the
+              classpath, so the shipped module stays honest and the test tree stays unconstrained.
+              The patch-module argument below supplies the already-compiled classes to javac so
+              that the `exports` clause resolves.
+            -->
+            <!--
+              Removes any module descriptor left in the output directory by an earlier build.
+
+              maven-compiler-plugin decides between classpath and module path by looking for
+              module-info.class in the output directory, and an incremental `mvn test` after a
+              previous `mvn verify` would otherwise find the one packaging left behind and switch
+              modes. Deleting it here, after compile and before test-compile, makes the choice
+              deterministic whether or not the build started clean.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>drop-stale-module-descriptor</id>
+                        <phase>process-classes</phase>
+                        <goals><goal>clean</goal></goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <failOnError>false</failOnError>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.outputDirectory}</directory>
+                                    <includes>
+                                        <include>module-info.class</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>compile-module-info</id>
+                        <!--
+                          Deliberately after test-compile. maven-compiler-plugin decides between
+                          classpath and module path by looking for module-info.class in the output
+                          directory, so the descriptor must not exist yet when tests are compiled.
+                          prepare-package still runs before the jar is assembled, so the shipped
+                          artifact is a proper module.
+                        -->
+                        <phase>prepare-package</phase>
+                        <goals><goal>compile</goal></goals>
+                        <configuration>
+                            <compileSourceRoots>
+                                <compileSourceRoot>${project.basedir}/src/main/module</compileSourceRoot>
+                            </compileSourceRoots>
+                            <compilerArgs>
+                                <arg>--patch-module</arg>
+                                <arg>com.classwright=${project.build.outputDirectory}</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- A build-time scratch file written by maven-compiler-plugin when it
+                             handles a module descriptor. Not ours, and not something consumers
+                             should find inside a published artifact. -->
+                        <exclude>META-INF/jpms.args</exclude>
+                    </excludes>
+                    <archive>
+                        <manifestEntries>
+                            <!-- Belt and braces alongside module-info, for classpath consumers. -->
+                            <Automatic-Module-Name>com.classwright</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!--
+                      Run tests on the classpath rather than the module path. The library itself is a
+                      proper JPMS module (module-info.java), but its own tests reach into internals
+                      and use JUnit, so patching the module for tests buys complexity with no
+                      benefit. Modular consumption is verified separately by the integration test.
+                    -->
+                    <useModulePath>false</useModulePath>
+                    <systemPropertyVariables>
+                        <!--
+                          Cache statistics are opt-in (the disabled counters cost the hit path
+                          nothing in production); the test suite turns them on so the counting
+                          itself stays covered.
+                        -->
+                        <classwright.cacheStats>true</classwright.cacheStats>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                    <!--
+                      CGLib 3.3.0 reaches into java.lang internals, which JDK 16 closed. The
+                      differential test cannot run without this, and needing it is itself part of
+                      what the test documents. Deliberately not applied to surefire: our own tests
+                      must keep running under normal encapsulation, or an accidental reach into a
+                      closed package would go unnoticed.
+                    -->
+                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <!--
+                          The MRU retention mode reads its property once into static-final state,
+                          so testing it needs a JVM of its own. MruRetentionIT skips itself (via
+                          an assumption) in the default execution above and runs for real here.
+                        -->
+                        <id>mru-retention</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/MruRetentionIT.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <classwright.cacheRetention>mru</classwright.cacheRetention>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!--
+                          Same static-final pattern as above, for the child-loader cohort limit.
+                          Forcing the cohort to one makes any concurrency overshoot of the limit —
+                          two classes sharing a loader — an assertion failure rather than a
+                          statistical rarity.
+                        -->
+                        <id>cohort-limit</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/ChildLoaderCohortIT.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <classwright.childLoaderCohort>1</classwright.childLoaderCohort>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,207 @@
+# CGLib 3.3.0 API elements this module deliberately does not reproduce exactly.
+#
+# Checked by CglibApiParityTest: the real CGLib jar is diffed against this module by complete
+# erased JVM descriptors (name, parameters AND return type), visibility rank, checked
+# exceptions, field attributes and constant values. Every gap must appear here, with its
+# reason, or the build fails. Deleting a line re-arms the check for that element; an entry
+# ending in * matches by prefix and is used only for subtrees that are out of scope wholesale,
+# never for packages this module partially covers - a wildcard there would let a real
+# regression hide behind it.
+#
+# The categories, in the compatibility vocabulary of docs/MIGRATION.md:
+#
+#   [ASM]         The element's signature names org.objectweb.asm types. Reproducing it means
+#                 taking the ASM dependency whose pinned shading ended CGLib. UNSUPPORTED.
+#   [GEN-SPI]     CGLib's AbstractClassGenerator machinery: protected hooks and supertypes of
+#                 the generator classes. Classwright's engine is a different architecture and
+#                 these hooks have no meaning in it. UNSUPPORTED.
+#   [SOURCE-USAGE-DEPENDENT] The member exists and behaves equivalently, but its JVM return
+#                 descriptor differs (a facade returns Object or a native Classwright type
+#                 where CGLib returned its own class, which generated subclasses made
+#                 possible). Two consequences, stated precisely: precompiled bytecode linking
+#                 CGLib's descriptor for one of THESE members does not link and needs
+#                 rebuilding; and after recompilation, the common factory-cast usage
+#                 ((MyKey) KeyFactory.create(...)) compiles and runs unchanged, but source
+#                 that assigns the result to CGLib's own type (KeyFactory f = ...;
+#                 Mixin m = ...) no longer compiles and needs a source edit. Every member in
+#                 this category is listed so the boundary is known, not guessed.
+#   [SUBCLASS]    Protected constructors/fields that existed for CGLib's *generated*
+#                 subclasses. Classwright's generated classes extend the native
+#                 com.classwright types instead, so this plumbing has nothing to serve.
+#                 INTENTIONAL GAP.
+#   [FACADE]      The compat class is a factory facade whose products are native Classwright
+#                 objects; the instance-side surface lives on the native type, documented in
+#                 each class's javadoc. INTENTIONAL GAP (source-visible).
+#   [BEANS-MIXIN] STYLE_BEANS mixins need a bean-property mixin generator the native library
+#                 does not have yet; candidate for a later release. UNSUPPORTED for now.
+#   [INTERNAL]    CGLib's ASM-era emitter/utility toolbox: public in the jar, internal in
+#                 nature. Classwright's equivalents are its own com.classwright.core engine.
+#                 UNSUPPORTED.
+
+# --- [ASM] ---------------------------------------------------------------------------------
+constructor net.sf.cglib.core.Signature#(java.lang.String,org.objectweb.asm.Type,org.objectweb.asm.Type[])
+method net.sf.cglib.core.Signature#getArgumentTypes():org.objectweb.asm.Type[]
+method net.sf.cglib.core.Signature#getReturnType():org.objectweb.asm.Type
+method net.sf.cglib.proxy.InterfaceMaker#add(net.sf.cglib.core.Signature,org.objectweb.asm.Type[]):void
+method net.sf.cglib.beans.BeanGenerator#generateClass(org.objectweb.asm.ClassVisitor):void
+method net.sf.cglib.proxy.Enhancer#generateClass(org.objectweb.asm.ClassVisitor):void
+method net.sf.cglib.proxy.InterfaceMaker#generateClass(org.objectweb.asm.ClassVisitor):void
+
+# MethodProxy.create/find built proxies from raw descriptors for CGLib's generated code to
+# call; nothing outside generated code could use them meaningfully. Intentionally unsupported.
+method net.sf.cglib.proxy.MethodProxy#static create(java.lang.Class,java.lang.Class,java.lang.String,java.lang.String,java.lang.String):net.sf.cglib.proxy.MethodProxy
+method net.sf.cglib.proxy.MethodProxy#static find(java.lang.Class,net.sf.cglib.core.Signature):net.sf.cglib.proxy.MethodProxy
+
+# KeyFactory's customizer SPI shapes generated key bytecode through ASM-typed callbacks.
+field net.sf.cglib.core.KeyFactory#CLASS_BY_NAME:net.sf.cglib.core.Customizer
+field net.sf.cglib.core.KeyFactory#HASH_ASM_TYPE:net.sf.cglib.core.HashCodeCustomizer
+field net.sf.cglib.core.KeyFactory#OBJECT_BY_CLASS:net.sf.cglib.core.Customizer
+field net.sf.cglib.core.KeyFactory#STORE_CLASS_AS_STRING:net.sf.cglib.core.FieldTypeCustomizer
+method net.sf.cglib.core.KeyFactory#static create(java.lang.Class,net.sf.cglib.core.Customizer):net.sf.cglib.core.KeyFactory
+method net.sf.cglib.core.KeyFactory#static create(java.lang.Class,net.sf.cglib.core.KeyFactoryCustomizer,java.util.List):net.sf.cglib.core.KeyFactory
+method net.sf.cglib.core.KeyFactory#static create(java.lang.ClassLoader,java.lang.Class,net.sf.cglib.core.Customizer):net.sf.cglib.core.KeyFactory
+method net.sf.cglib.core.KeyFactory#static create(java.lang.ClassLoader,java.lang.Class,net.sf.cglib.core.KeyFactoryCustomizer,java.util.List):net.sf.cglib.core.KeyFactory
+type net.sf.cglib.core.Customizer
+type net.sf.cglib.core.FieldTypeCustomizer
+type net.sf.cglib.core.HashCodeCustomizer
+type net.sf.cglib.core.KeyFactoryCustomizer
+
+# --- [GEN-SPI] -----------------------------------------------------------------------------
+type net.sf.cglib.core.AbstractClassGenerator
+type net.sf.cglib.core.ClassGenerator
+type net.sf.cglib.core.DefaultGeneratorStrategy
+type net.sf.cglib.core.GeneratorStrategy
+type net.sf.cglib.proxy.Enhancer$EnhancerKey
+shape net.sf.cglib.beans.BeanGenerator extends net.sf.cglib.core.AbstractClassGenerator
+shape net.sf.cglib.beans.BeanGenerator implements net.sf.cglib.core.ClassGenerator
+shape net.sf.cglib.proxy.Enhancer extends net.sf.cglib.core.AbstractClassGenerator
+shape net.sf.cglib.proxy.Enhancer implements net.sf.cglib.core.ClassGenerator
+shape net.sf.cglib.proxy.InterfaceMaker extends net.sf.cglib.core.AbstractClassGenerator
+shape net.sf.cglib.proxy.InterfaceMaker implements net.sf.cglib.core.ClassGenerator
+method net.sf.cglib.beans.BeanGenerator#firstInstance(java.lang.Class):java.lang.Object
+method net.sf.cglib.beans.BeanGenerator#getDefaultClassLoader():java.lang.ClassLoader
+method net.sf.cglib.beans.BeanGenerator#getProtectionDomain():java.security.ProtectionDomain
+method net.sf.cglib.beans.BeanGenerator#nextInstance(java.lang.Object):java.lang.Object
+method net.sf.cglib.proxy.Enhancer#filterConstructors(java.lang.Class,java.util.List):void
+method net.sf.cglib.proxy.Enhancer#firstInstance(java.lang.Class):java.lang.Object
+method net.sf.cglib.proxy.Enhancer#generate(net.sf.cglib.core.AbstractClassGenerator$ClassLoaderData):java.lang.Class
+method net.sf.cglib.proxy.Enhancer#getDefaultClassLoader():java.lang.ClassLoader
+method net.sf.cglib.proxy.Enhancer#getProtectionDomain():java.security.ProtectionDomain
+method net.sf.cglib.proxy.Enhancer#nextInstance(java.lang.Object):java.lang.Object
+method net.sf.cglib.proxy.Enhancer#unwrapCachedValue(java.lang.Object):java.lang.Object
+method net.sf.cglib.proxy.Enhancer#wrapCachedClass(java.lang.Class):java.lang.Object
+method net.sf.cglib.proxy.InterfaceMaker#firstInstance(java.lang.Class):java.lang.Object
+method net.sf.cglib.proxy.InterfaceMaker#getDefaultClassLoader():java.lang.ClassLoader
+method net.sf.cglib.proxy.InterfaceMaker#nextInstance(java.lang.Object):java.lang.Object
+
+# --- [SOURCE-USAGE-DEPENDENT] return-descriptor differences of the facade architecture -----
+# CGLib's factories returned its own abstract bases because generated classes extended them;
+# Classwright's generated classes extend the native com.classwright types, so these factories
+# return Object (cast to your interface, the universal usage) or the native delegate type.
+# Precompiled binaries linking THESE descriptors rebuild; recompiled source keeps working
+# except where it assigned the result to CGLib's own facade type, which needs a source edit.
+method net.sf.cglib.core.KeyFactory#static create(java.lang.Class):net.sf.cglib.core.KeyFactory
+method net.sf.cglib.proxy.Mixin#static create(java.lang.Class[],java.lang.Object[]):net.sf.cglib.proxy.Mixin
+method net.sf.cglib.proxy.Mixin#static create(java.lang.Object[]):net.sf.cglib.proxy.Mixin
+method net.sf.cglib.reflect.ConstructorDelegate#static create(java.lang.Class,java.lang.Class):net.sf.cglib.reflect.ConstructorDelegate
+method net.sf.cglib.reflect.MethodDelegate#static create(java.lang.Object,java.lang.String,java.lang.Class):net.sf.cglib.reflect.MethodDelegate
+method net.sf.cglib.reflect.MethodDelegate#static createStatic(java.lang.Class,java.lang.String,java.lang.Class):net.sf.cglib.reflect.MethodDelegate
+method net.sf.cglib.reflect.MulticastDelegate#static create(java.lang.Class):net.sf.cglib.reflect.MulticastDelegate
+
+# --- [SUBCLASS] ----------------------------------------------------------------------------
+constructor net.sf.cglib.beans.BeanMap#()
+constructor net.sf.cglib.beans.BeanMap#(java.lang.Object)
+field net.sf.cglib.beans.BeanMap#bean:java.lang.Object
+# CGLib's BeanMap extended Object and implemented every Map method in generated code; this one
+# extends AbstractMap, which supplies the Map plumbing. Strictly additive for callers — every
+# CGLib-visible member still exists — and only observable to code that subclasses BeanMap,
+# which is the generated-subclass pattern this whole category covers.
+shape net.sf.cglib.beans.BeanMap extends java.lang.Object
+constructor net.sf.cglib.beans.BulkBean#()
+field net.sf.cglib.beans.BulkBean#getters:java.lang.String[]
+field net.sf.cglib.beans.BulkBean#setters:java.lang.String[]
+field net.sf.cglib.beans.BulkBean#target:java.lang.Class
+field net.sf.cglib.beans.BulkBean#types:java.lang.Class[]
+constructor net.sf.cglib.reflect.FastClass#()
+constructor net.sf.cglib.reflect.FastClass#(java.lang.Class)
+constructor net.sf.cglib.reflect.FastMember#(net.sf.cglib.reflect.FastClass,java.lang.reflect.Member,int)
+field net.sf.cglib.reflect.FastMember#fc:net.sf.cglib.reflect.FastClass
+field net.sf.cglib.reflect.FastMember#index:int
+field net.sf.cglib.reflect.FastMember#member:java.lang.reflect.Member
+type net.sf.cglib.beans.BeanCopier$Generator
+type net.sf.cglib.beans.BeanMap$Generator
+type net.sf.cglib.beans.BulkBean$Generator
+type net.sf.cglib.beans.ImmutableBean$Generator
+type net.sf.cglib.core.KeyFactory$Generator
+type net.sf.cglib.proxy.Mixin$Generator
+type net.sf.cglib.reflect.ConstructorDelegate$Generator
+type net.sf.cglib.reflect.FastClass$Generator
+type net.sf.cglib.reflect.MethodDelegate$Generator
+type net.sf.cglib.reflect.MulticastDelegate$Generator
+
+# --- [FACADE] ------------------------------------------------------------------------------
+# MethodDelegate/MulticastDelegate/ConstructorDelegate: the compat class is the factory; the
+# object it returns is the native delegate, which carries the instance methods listed here.
+# Their protected constructors exist in CGLib for generated subclasses (private here).
+visibility constructor net.sf.cglib.reflect.ConstructorDelegate#() is narrower here than in CGLib
+visibility constructor net.sf.cglib.reflect.MethodDelegate#() is narrower here than in CGLib
+visibility constructor net.sf.cglib.reflect.MulticastDelegate#() is narrower here than in CGLib
+field net.sf.cglib.reflect.MethodDelegate#eqMethod:java.lang.String
+field net.sf.cglib.reflect.MethodDelegate#target:java.lang.Object
+field net.sf.cglib.reflect.MulticastDelegate#targets:java.lang.Object[]
+method net.sf.cglib.reflect.MethodDelegate#getTarget():java.lang.Object
+method net.sf.cglib.reflect.MethodDelegate#newInstance(java.lang.Object):net.sf.cglib.reflect.MethodDelegate
+method net.sf.cglib.reflect.MulticastDelegate#add(java.lang.Object):net.sf.cglib.reflect.MulticastDelegate
+method net.sf.cglib.reflect.MulticastDelegate#addHelper(java.lang.Object):net.sf.cglib.reflect.MulticastDelegate
+method net.sf.cglib.reflect.MulticastDelegate#getTargets():java.util.List
+method net.sf.cglib.reflect.MulticastDelegate#newInstance():net.sf.cglib.reflect.MulticastDelegate
+method net.sf.cglib.reflect.MulticastDelegate#remove(java.lang.Object):net.sf.cglib.reflect.MulticastDelegate
+shape net.sf.cglib.reflect.ConstructorDelegate is final here but subclassable in CGLib
+shape net.sf.cglib.reflect.MethodDelegate is final here but subclassable in CGLib
+shape net.sf.cglib.reflect.MulticastDelegate implements java.lang.Cloneable
+shape net.sf.cglib.reflect.MulticastDelegate is final here but subclassable in CGLib
+
+# --- [BEANS-MIXIN] -------------------------------------------------------------------------
+method net.sf.cglib.proxy.Mixin#static createBean(java.lang.ClassLoader,java.lang.Object[]):net.sf.cglib.proxy.Mixin
+method net.sf.cglib.proxy.Mixin#static createBean(java.lang.Object[]):net.sf.cglib.proxy.Mixin
+
+# --- [INTERNAL] ----------------------------------------------------------------------------
+type net.sf.cglib.beans.FixedKeySet
+type net.sf.cglib.core.Block
+type net.sf.cglib.core.ClassEmitter
+type net.sf.cglib.core.ClassInfo
+type net.sf.cglib.core.ClassNameReader
+type net.sf.cglib.core.ClassesKey
+type net.sf.cglib.core.CodeEmitter
+type net.sf.cglib.core.CollectionUtils
+type net.sf.cglib.core.Constants
+type net.sf.cglib.core.DebuggingClassWriter
+type net.sf.cglib.core.DuplicatesPredicate
+type net.sf.cglib.core.EmitUtils
+type net.sf.cglib.core.EmitUtils$ArrayDelimiters
+type net.sf.cglib.core.Local
+type net.sf.cglib.core.LocalVariablesSorter
+type net.sf.cglib.core.MethodInfo
+type net.sf.cglib.core.MethodInfoTransformer
+type net.sf.cglib.core.MethodWrapper
+type net.sf.cglib.core.MethodWrapper$MethodWrapperKey
+type net.sf.cglib.core.ObjectSwitchCallback
+type net.sf.cglib.core.ProcessArrayCallback
+type net.sf.cglib.core.ProcessSwitchCallback
+type net.sf.cglib.core.ReflectUtils
+type net.sf.cglib.core.RejectModifierPredicate
+type net.sf.cglib.core.TinyBitSet
+type net.sf.cglib.core.Transformer
+type net.sf.cglib.core.TypeUtils
+type net.sf.cglib.core.VisibilityPredicate
+type net.sf.cglib.core.WeakCacheKey
+type net.sf.cglib.core.internal.*
+
+# --- out-of-scope subtrees -----------------------------------------------------------------
+# transform: build/load-time class-file transformation. It requires parsing class files, the
+# architecture Classwright exists to avoid; applications using it are not Enhancer users.
+type net.sf.cglib.transform.*
+
+# util: ParallelSorter and StringSwitcher are ASM code generators with no native counterpart;
+# both have straightforward plain-Java replacements for migrating code.
+type net.sf.cglib.util.*
